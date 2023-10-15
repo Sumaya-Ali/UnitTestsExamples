@@ -1,4 +1,4 @@
-﻿using System;
+﻿ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,17 +7,28 @@ using System.Threading.Tasks;
 namespace UnitTestsExamples
 {
     #region "Helper Classes"
-    public class MyObject {
+
+    public interface IMyObject { 
+    
+    }
+    public class MyObject: IMyObject {
         public string fname;
         public string lname;
     }
 
-    public class Sub_Functions {
+    //Must be Interface because FakeItEasy just faking and mocking interfaces !!
+    public interface ISub_Functions {
+        public bool func_return_bool();
+        public IMyObject func_params_return_my_object(string fname, string lname);
+        public IEnumerable<MyObject> func_return_List_new_object();
+    }
+
+    public class Sub_Functions: ISub_Functions {
         public bool func_return_bool() {
             return false;
         }
 
-        public MyObject func_params_return_my_object(string fname,string lname) {
+        public IMyObject func_params_return_my_object(string fname,string lname) {
             return new MyObject()
             {
                 fname = fname,
@@ -25,7 +36,7 @@ namespace UnitTestsExamples
             };
         }
 
-        public List<MyObject> func_return_List_new_object() {
+        public IEnumerable<MyObject> func_return_List_new_object() {
             return new List<MyObject> {
                 new MyObject()
                 {
@@ -42,20 +53,17 @@ namespace UnitTestsExamples
     #endregion
     public class Functions
     {
-        public Functions()
-        {
-
-        }
-        /*
+        
         #region "Initialization"
-        private readonly Sub_Functions sub_Functions;
-        public Functions(Sub_Functions sub_Functions)
+        private readonly ISub_Functions sub_Functions;
+        
+        public Functions(ISub_Functions sub_Functions)
         {
             this.sub_Functions = sub_Functions;
         }
         #endregion
 
-        */
+        
 
         #region "Normal Unit Tests"
         public string func_return_string(int num) {
@@ -103,7 +111,7 @@ namespace UnitTestsExamples
         }
         #endregion
 
-        /*
+        
         #region "Mocking Unit Tests"
         public string func_call_sub_function_class() {
 
@@ -118,17 +126,16 @@ namespace UnitTestsExamples
             }
         }
          
-        public MyObject func_call_sub_functions_class_return_my_object() {
+        public IMyObject func_call_sub_functions_class_return_my_object() {
             var _object = sub_Functions.func_params_return_my_object("Samar", "Sous");
             return _object;
         }
 
-        public List<MyObject> func_call_sub_functions_class_return_list_my_object() {
+        public IEnumerable<MyObject> func_call_sub_functions_class_return_list_my_object() {
             var _listobject = sub_Functions.func_return_List_new_object();
             return _listobject;
         }
         #endregion
 
-        */
     }
 }

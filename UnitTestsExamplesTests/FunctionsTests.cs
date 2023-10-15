@@ -1,3 +1,4 @@
+using FakeItEasy;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using System.Xml.Linq;
@@ -5,25 +6,31 @@ using UnitTestsExamples;
 
 namespace UnitTestsExamplesTests;
 
-public class FunctionsTests : IClassFixture<Functions>
+public class FunctionsTests //: IClassFixture<Functions>
 {
     // for more build_in assertion function visit: https://fluentassertions.com/
 
     #region "Initialization"
     /*
-      when we choose to use dependency injection to define the testclass instance and not create
+      when we choose to use dependency injection to define the testclass instance and pass it throught testing constructer and not create
      it locally in every single unittest function then we must implement the interface ((: IClassFixture<Functions>))
      and we must be sure that the testingclass (function) constructer does ((NOT)) have any external dependencies
      or we must use Mocking to these dependencies too !!
+    In case having external dependencies do not use dependency injection or : IClassFixture<Functions> at All !!
      */
     private readonly Functions functions;
-    public FunctionsTests(Functions functions)
+    private readonly ISub_Functions sub_Functions; //Must be Interface because FakeItEasy just faking and mocking interfaces !!
+    public FunctionsTests()
     {
-        this.functions = functions;
+        //Dependencies
+        sub_Functions = A.Fake<ISub_Functions>();
+
+        //SUT
+        functions = new Functions(sub_Functions);
     }
     #endregion
 
-    
+
     #region "Normal Unit Tests"
 
     [Fact]
@@ -31,12 +38,12 @@ public class FunctionsTests : IClassFixture<Functions>
     {
         //Arrange
         int num = 0;
-    //    Functions functions = new Functions();
+        //    Functions functions = new Functions();
         //Act
-        var result= functions.func_return_string(num);
+        var result = functions.func_return_string(num);
         //Assert
         result.Should().NotBeNullOrWhiteSpace();
-        result.Should().Contain("Syrien",Exactly.Once());
+        result.Should().Contain("Syrien", Exactly.Once());
         result.Should().Be("Ich mag Syrien");
     }
 
@@ -51,12 +58,12 @@ public class FunctionsTests : IClassFixture<Functions>
         result.Should().EndWith("INE");
     }
     [Theory]
-    [InlineData(3,5,8)]
-    [InlineData(7,3,10)]
+    [InlineData(3, 5, 8)]
+    [InlineData(7, 3, 10)]
     public void func_adding_num_return_int_return_sum(int a, int b, int expected) {
         //Arrange
         //Act
-        var result = functions.func_adding_num_return_int(a,b);
+        var result = functions.func_adding_num_return_int(a, b);
 
         //Assert
         result.Should().Be(expected);
@@ -79,9 +86,9 @@ public class FunctionsTests : IClassFixture<Functions>
     [Fact]
     public void func_get_my_object_return_object() {
         //Arrange
-        MyObject expected = new MyObject{
+        MyObject expected = new MyObject {
             fname = "Sumaya",
-                lname = "Ali"
+            lname = "Ali"
         };
         //Act
         var result = functions.func_get_my_object();
@@ -106,6 +113,39 @@ public class FunctionsTests : IClassFixture<Functions>
         result.Should().BeOfType<List<MyObject>>();
         result.Should().ContainEquivalentOf(expected);
         result.Should().Contain(x => x.lname == "Ali");
+    }
+    #endregion
+
+    #region "Mocking Unit Tests"
+
+    [Fact]
+    public void func_call_sub_function_class_return_string() {
+        //Arrange
+        A.CallTo(()=> sub_Functions.func_return_bool()).Returns(true);
+        //Act
+        var result = functions.func_call_sub_function_class();
+        //Assert
+        result.Should().Contain("passed");
+    }
+    [Fact]
+    public void func_call_sub_functions_class_return_my_object_return_object() {
+        //Arrange
+        var myobject = A.Fake<IMyObject>(); // Again Must be Intetface (:
+        A.CallTo(()=> sub_Functions.func_params_return_my_object("Samar", "Sous")).Returns(myobject);
+        //Act
+        var result = functions.func_call_sub_functions_class_return_my_object();
+        //Assert
+        result.Should().NotBeNull();
+    }
+    [Fact]
+    public void func_call_sub_functions_class_return_list_my_object_return_list() {
+        //Arrange
+        var listofobjects = A.Fake<IEnumerable<MyObject>>(); // Must be Interface IEnumerable so we can fake it (: 
+        A.CallTo(()=> sub_Functions.func_return_List_new_object()).Returns(listofobjects);
+        //Act
+        var result = functions.func_call_sub_functions_class_return_list_my_object();
+        //Assert
+        result.Should().NotBeNull();
     }
     #endregion
 
