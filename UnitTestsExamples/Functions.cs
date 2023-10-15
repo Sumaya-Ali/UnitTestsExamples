@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace UnitTestsExamples
 {
+    #region "Helper Classes"
     public class MyObject {
         public string fname;
         public string lname;
@@ -38,26 +39,37 @@ namespace UnitTestsExamples
             };
         }
     }
-
+    #endregion
     public class Functions
     {
+        public Functions()
+        {
+
+        }
+        /*
+        #region "Initialization"
         private readonly Sub_Functions sub_Functions;
         public Functions(Sub_Functions sub_Functions)
         {
             this.sub_Functions = sub_Functions;
         }
+        #endregion
+
+        */
+
+        #region "Normal Unit Tests"
         public string func_return_string(int num) {
             if (num == 0)
             {
-                return "Syrien";
+                return "Ich mag Syrien";
             }
             else {
-                return "Deutschland";
+                return "Ich mag Deutschland";
             }
         }
 
         public string func_without_params_return_string() {
-            return "Palestine";
+            return "PALESTINE";
         }
 
         public int func_adding_num_return_int(int a, int b) {
@@ -89,7 +101,10 @@ namespace UnitTestsExamples
                 }
             };
         }
+        #endregion
 
+        /*
+        #region "Mocking Unit Tests"
         public string func_call_sub_function_class() {
 
             var iscall = sub_Functions.func_return_bool();
@@ -112,5 +127,8 @@ namespace UnitTestsExamples
             var _listobject = sub_Functions.func_return_List_new_object();
             return _listobject;
         }
+        #endregion
+
+        */
     }
 }
