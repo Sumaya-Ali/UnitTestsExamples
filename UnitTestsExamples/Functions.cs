@@ -102,7 +102,7 @@ namespace UnitTestsExamples
                 return "false - failed";
             }
         }
-
+         
         public MyObject func_call_sub_functions_class_return_my_object() {
             var _object = sub_Functions.func_params_return_my_object("Samar", "Sous");
             return _object;
