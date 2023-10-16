@@ -1,8 +1,12 @@
+using Castle.DynamicProxy.Generators;
 using FakeItEasy;
 using FluentAssertions;
 using FluentAssertions.Extensions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Xml.Linq;
 using UnitTestsExamples;
+using UnitTestsExamples.Data;
 
 namespace UnitTestsExamplesTests;
 
@@ -20,14 +24,39 @@ public class FunctionsTests //: IClassFixture<Functions>
      */
     private readonly Functions functions;
     private readonly ISub_Functions sub_Functions; //Must be Interface because FakeItEasy just faking and mocking interfaces !!
-    public FunctionsTests()
+ 
+
+    public  FunctionsTests()
     {
         //Dependencies
         sub_Functions = A.Fake<ISub_Functions>();
-
         //SUT
         functions = new Functions(sub_Functions);
     }
+
+    private async Task<ApplicationDBContext> GetDBContext() {
+        var options = new DbContextOptionsBuilder<ApplicationDBContext>()
+            .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+           .Options;
+       
+        var databaseContext = new ApplicationDBContext(options,inMemoryDB:true);
+       
+        databaseContext.Database.EnsureCreated();
+        //  if (await databaseContext.myObjects.CountAsync() < 0) {
+        for (int i = 1; i <= 10; i++) {
+                databaseContext.myObjects.Add(
+                    new MyObjectDataModel() {
+                        Id= i,
+                        FName="soso",
+                        LName="jojo"
+                    }
+                    );
+                await databaseContext.SaveChangesAsync();
+            }
+      //  }
+        return databaseContext;
+    }
+
     #endregion
 
 
@@ -146,6 +175,42 @@ public class FunctionsTests //: IClassFixture<Functions>
         var result = functions.func_call_sub_functions_class_return_list_my_object();
         //Assert
         result.Should().NotBeNull();
+    }
+    #endregion
+
+    #region "In Memory Unit Tests"
+
+    [Fact]
+    public async void func_add_return_true() {
+        //Arrange
+        var _object = new MyObjectDataModel()
+        {
+            Id=11,
+            FName = "lolo",
+            LName = "nono"
+        };
+        var dbContext = await GetDBContext(); //we must declare this here because it is (async await) 
+        // and we can ((Not)) do it in constructer !!
+
+        dbContext.myObjects.AsNoTracking();
+        var _functions = new Functions(dbContext);
+        //Act
+        var result = _functions.func_add(_object);
+        //Assert
+        result.Should().Be(true);
+    }
+
+    [Fact]
+    public async void func_get_by_id_return_object() {
+        //Arrange
+        int id = 1;
+        var dbContext = await GetDBContext();
+        var _functions = new Functions(dbContext);
+        //Act
+        var result = _functions.func_get_by_id(id);
+        //Assert
+        result.Should().NotBeNull();
+        result.Should().BeOfType<MyObjectDataModel>();
     }
     #endregion
 

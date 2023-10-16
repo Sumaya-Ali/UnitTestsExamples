@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnitTestsExamples.Data;
 
 namespace UnitTestsExamples
 {
@@ -56,10 +57,14 @@ namespace UnitTestsExamples
         
         #region "Initialization"
         private readonly ISub_Functions sub_Functions;
-        
+        private readonly ApplicationDBContext dbContext;
         public Functions(ISub_Functions sub_Functions)
         {
             this.sub_Functions = sub_Functions;
+        }
+        public Functions(ApplicationDBContext dbContext)
+        {
+            this.dbContext = dbContext;
         }
         #endregion
 
@@ -134,6 +139,26 @@ namespace UnitTestsExamples
         public IEnumerable<MyObject> func_call_sub_functions_class_return_list_my_object() {
             var _listobject = sub_Functions.func_return_List_new_object();
             return _listobject;
+        }
+        #endregion
+
+        #region "In Memory Unit Tests"
+        public bool func_add(MyObjectDataModel obj)
+        {
+            dbContext.myObjects.Add(obj);
+            var result =  dbContext.SaveChanges();
+            if (result == 1)
+            {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        public MyObjectDataModel func_get_by_id(int id)
+        {
+            var result = dbContext.myObjects.Find(id);
+            return result;
         }
         #endregion
 
