@@ -1,6 +1,9 @@
 # UnitTestsExamples   
 UnitTests/Fluent Assertions/ Mocking using FakeItEasy/ InMemory/ DBContext (code first) for Console Application   
-There are three types of testing: (Unit tests (do not hit the DB)/ Integration tests (hit the DB)/ end-t-end test ( ex: selenium)   
+There are three types of testing:    
+Unit tests (do not hit the DB)    
+Integration tests (like unit test bit hit the HTTP URL (see HerrenHaus API Repository Project) https://github.com/Sumaya-Ali/HerrenHaus        
+end-t-end test ( ex: selenium/ hit the DB)   
 There are three types of unit tests (same concept, different syntax): MsTest/ NUnit/ XUnit   
 In this project, I have used XUnit   
 All UnitTests are public void functions and contain the following sections:    
@@ -18,5 +21,5 @@ we specify that this object /class /function does not create it and go into deta
 there are three common libraries for mocking: Mock/ FakeItEasy/ NSubstitute (same concept, different syntax)    
 In this project, I have used FakeItEasy   
 ===================================================
-UnitTest must not modify DB, that is why we use (in Memory package) to do operations on virtual memory   
+UnitTest must not modify DB, that is why we use (in Memory package) to do operations in virtual memory - we use in Memory & Mocking in Integration Tests too       
 ===================================================
